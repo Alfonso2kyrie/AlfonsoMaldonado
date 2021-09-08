@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <nav>
+
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Ver datos</button>
+                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Registrar</button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+                <div >
+                    <div id="response"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade col-md-6" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <form action="">
+                    <div>
+                        <label for="">Nombre</label>
+                        <input id="name" type="text" required>
+                    </div>
+
+                    <div>
+                        <label for="">Trabajo</label>
+                        <input id="job" type="text" required>
+                    </div>
+                    <button type="button" onclick="registrar()" class="btn btn-success">Registrar</button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <footer >
+        Alfonso Maldonado Sanchez
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+
+    <script>
+        let lista1 = [];
+
+        function get() {
+            return new Promise(function(resolve, reject) {
+                var req = new XMLHttpRequest();
+                req.open('GET', 'https://reqres.in/api/users?page=2');
+
+                req.onload = function() {
+                    if (req.status == 200) {
+                        resolve(JSON.parse(req.response));
+                    } else {
+                        reject();
+                    }
+                };
+
+                req.send();
+            })
+        }
+
+        get().then(data => {
+
+            console.log(data.data);
+            let res = document.querySelector('#response');
+            let lista2 = JSON.stringify(data.data)
+            let aux = JSON.parse(lista2);
+            console.log(aux);
+            res.innerHTML = '';
+            lista1 = aux;
+            i = 1;
+            for (let item of lista1) {
+                console.log(item);
+                res.innerHTML += `
+                <div class="col-md-12">
+                <div class="card" style="width: 18rem;">
+                    <img src="${item.avatar}" class="card-img-top" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">${i++} ${item.first_name}</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        
+                    </div>
+                    </div>
+                    </div>
+                
+                `;
+            }
+        });
+
+
+        function create() {
+            let res2 = document.querySelector('#response');
+            res2.innerHTML += `
+                <tr>
+                    
+                    <td>${document.getElementById('name').value}</td>
+                    <td>${document.getElementById('job').value}</td>
+                </tr>
+                `;
+        };
+
+
+        var peticion;
+
+        function registrar() {
+            let url = 'https://reqres.in/api/users';
+            let obj = {
+                name: document.getElementById('name').value,
+                job: document.getElementById('job').value
+            }
+            console.log(obj);
+            let aux = JSON.stringify(obj)
+            console.log(aux);
+
+            return new Promise(function(resolve, reject) {
+
+                peticion = new XMLHttpRequest();
+                peticion.onreadystatechange = alertContents;
+                peticion.open('POST', url);
+                peticion.setRequestHeader('Content-Type', 'application/json');
+                peticion.send(aux);
+            });
+        };
+
+        function alertContents() {
+            if (peticion.readyState === XMLHttpRequest.DONE) {
+                if (peticion.status === 200) {
+                    alert(peticion.responseText);
+                } else {
+                    alert("Guardando" + peticion.responseText);
+                    create();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
